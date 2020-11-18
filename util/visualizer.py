@@ -4,6 +4,7 @@ import ntpath
 import time
 from . import util
 from . import html
+import torch
 
 class Visualizer():
     def __init__(self, opt):
@@ -97,15 +98,25 @@ class Visualizer():
             self.plot_data = {'X':[],'Y':[], 'legend':list(errors.keys())}
         self.plot_data['X'].append(epoch + counter_ratio)
         self.plot_data['Y'].append([errors[k] for k in self.plot_data['legend']])
+        print('x',  self.plot_data['X'])
+        print('y',  self.plot_data['Y'])
+        print('legend',  self.plot_data['legend'])
+        
+        y = torch.FloatTensor(self.plot_data['Y'])
+        y = np.array(y)
+        x=np.stack([np.array(self.plot_data['X'])]*len(self.plot_data['legend']),1)
+        #x = np.squeeze(x)
+        print('x ', x)
+        print('y ', y)
         self.vis.line(
-            X=np.stack([np.array(self.plot_data['X'])]*len(self.plot_data['legend']),1),
-            Y=np.array(self.plot_data['Y']),
+            X=x,
+            Y=y,
             opts={
                 'title': self.name + ' loss over time',
                 'legend': self.plot_data['legend'],
                 'xlabel': 'epoch',
                 'ylabel': 'loss'},
-            win=self.display_id)
+                win=self.display_id)
 
     # errors: same format as |errors| of plotCurrentErrors
     def print_current_errors(self, epoch, i, errors, t):

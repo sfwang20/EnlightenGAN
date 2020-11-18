@@ -274,6 +274,7 @@ class ResnetGenerator(nn.Module):
         self.model = nn.Sequential(*model)
 
     def forward(self, input):
+        print('ResnetGenerator forward\r\n');  
         if self.gpu_ids and isinstance(input.data, torch.cuda.FloatTensor):
             return nn.parallel.data_parallel(self.model, input, self.gpu_ids)
         else:
@@ -319,6 +320,7 @@ class ResnetBlock(nn.Module):
         return nn.Sequential(*conv_block)
 
     def forward(self, x):
+        print('ResnetBlock forward\r\n');  
         out = x + self.conv_block(x)
         return out
 
@@ -352,6 +354,7 @@ class UnetGenerator(nn.Module):
             self.model = unet_block
 
     def forward(self, input):
+        print('UnetGenerator forward\r\n');  
         if self.gpu_ids and isinstance(input.data, torch.cuda.FloatTensor):
             return nn.parallel.data_parallel(self.model, input, self.gpu_ids)
         else:
@@ -364,6 +367,7 @@ class SkipModule(nn.Module):
         self.opt = opt
 
     def forward(self, x):
+        print('SkipModule forward\r\n');  
         latent = self.submodule(x)
         return self.opt.skip*x + latent, latent
 
@@ -441,6 +445,7 @@ class UnetSkipConnectionBlock(nn.Module):
         self.model = nn.Sequential(*model)
 
     def forward(self, x):
+        print('UnetSkipConnectionBlock forward\r\n');  
         if self.outermost:
             return self.model(x)
         else:
@@ -492,6 +497,7 @@ class NLayerDiscriminator(nn.Module):
         # if len(self.gpu_ids) and isinstance(input.data, torch.cuda.FloatTensor):
         #     return nn.parallel.data_parallel(self.model, input, self.gpu_ids)
         # else:
+        print('NLayerDiscriminator forward\r\n');  
         return self.model(input)
 
 class NoNormDiscriminator(nn.Module):
@@ -536,6 +542,7 @@ class NoNormDiscriminator(nn.Module):
         # if len(self.gpu_ids) and isinstance(input.data, torch.cuda.FloatTensor):
         #     return nn.parallel.data_parallel(self.model, input, self.gpu_ids)
         # else:
+        print('NoNormDiscriminator forward\r\n');  
         return self.model(input)
 
 class FCDiscriminator(nn.Module):
@@ -580,6 +587,7 @@ class FCDiscriminator(nn.Module):
         self.model = nn.Sequential(*sequence)
 
     def forward(self, input):
+        print('FCDiscriminator forward\r\n');  
         batchsize = input.size()[0]
         output = self.model(input)
         output = output.view(batchsize,-1)
@@ -717,6 +725,7 @@ class Unet_resize_conv(nn.Module):
         return output
 
     def forward(self, input, gray):
+        print('Unet_resize_conv forward\r\n');
         flag = 0
         if input.size()[3] > 2200:
             avg = nn.AvgPool2d(2)
@@ -915,6 +924,7 @@ class DnCNN(nn.Module):
         self._initialize_weights()
 
     def forward(self, x):
+        print('DnCNN forward\r\n');
         y = x
         out = self.dncnn(x)
         return y+out
@@ -952,6 +962,7 @@ class Vgg16(nn.Module):
         self.conv5_3 = nn.Conv2d(512, 512, kernel_size=3, stride=1, padding=1)
 
     def forward(self, X, opt):
+        print('vgg16 forward\r\n');
         h = F.relu(self.conv1_1(X), inplace=True)
         h = F.relu(self.conv1_2(h), inplace=True)
         # relu1_2 = h
@@ -1125,6 +1136,7 @@ class FCN32s(nn.Module):
                 m.weight.data.copy_(initial_weight)
 
     def forward(self, x):
+        print('FCN32s forward\r\n');
         h = x
         h = self.relu1_1(self.conv1_1(h))
         h = self.relu1_2(self.conv1_2(h))
